@@ -55,6 +55,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* AimingAction;
 
+<<<<<<< HEAD
 
 	bool bFireButtonPressed;
 
@@ -64,6 +65,8 @@ protected:
 
 	FTimerHandle AutoFireTimer;
 
+=======
+>>>>>>> 03c7f33c3e2095f4cf441e14be68e8c45da9098a
 
 private:
 	
