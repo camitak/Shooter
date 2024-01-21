@@ -12,6 +12,7 @@ class UInputAction;
 class USoundCue;
 class UParticleSystem;
 class UAnimMontage;
+class AItem;
 
 UCLASS()
 class SHOOTER_API AShooterCharacter : public ACharacter
@@ -22,16 +23,19 @@ public:
 	AShooterCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void IncrementOverlappedItemCount(int8 Amount);
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void Move(const FInputActionValue& Value);
 	virtual void Look(const FInputActionValue& Value);
+	void FireButtonPressed(const FInputActionValue& Value);
 	void AimingButtonPressed(const FInputActionValue& Value);
 	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
 	void CalculateCrosshairSpread(float DeltaTime);
-	
 	void StartCrosshairBulletFire();
+	bool TraceUnderCrosshairs(FHitResult& OutHitResult, FVector& OutHitLocation);
+	void TraceForItems();
 
 	UFUNCTION()
 	void FinishCrosshairBulletFire();
@@ -55,8 +59,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* AimingAction;
 
-<<<<<<< HEAD
-
 	bool bFireButtonPressed;
 
 	bool bShouldFire;
@@ -65,14 +67,15 @@ protected:
 
 	FTimerHandle AutoFireTimer;
 
-=======
->>>>>>> 03c7f33c3e2095f4cf441e14be68e8c45da9098a
-
 private:
 	
 	void FireWeapon();
 	void CameraInterpZoom(float DeltaTime);
 	void SetLookRates();
+	void StartFireTimer();
+	
+	UFUNCTION()
+	void AutoFireReset();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -139,6 +142,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Crosshairs, meta = (AllowPrivateAccess = "true"))
 	float CrosshairShootingFactor;
 
+	//The AItem that was hit in the last frame
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items, meta = (AllowPrivateAccess = "true"))
+	AItem* TraceHitItemLastFrame;
+
+
 	float ShootTimeDuration;
 	bool bFiringBullet;
 	FTimerHandle CrosshairShootTimer;
@@ -147,11 +155,17 @@ private:
 	float CameraZoomedFOV;
 	float CameraCurrentFOV;
 
+	bool bShouldTraceForItems;
+	int8 OverlappedItemCount;
+
+
+
 public:	
 
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE bool GetAiming() const { return bAiming; }
+	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
 
 	UFUNCTION(BlueprintCallable)
 	float GetCrosshairSpreadMultiplier() const;
