@@ -13,6 +13,7 @@ class USoundCue;
 class UParticleSystem;
 class UAnimMontage;
 class AItem;
+class AWeapon;
 
 UCLASS()
 class SHOOTER_API AShooterCharacter : public ACharacter
@@ -30,12 +31,16 @@ protected:
 	virtual void Move(const FInputActionValue& Value);
 	virtual void Look(const FInputActionValue& Value);
 	void FireButtonPressed(const FInputActionValue& Value);
+	void SelectButtonPressed(const FInputActionValue& Value);
 	void AimingButtonPressed(const FInputActionValue& Value);
 	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
 	void CalculateCrosshairSpread(float DeltaTime);
 	void StartCrosshairBulletFire();
 	bool TraceUnderCrosshairs(FHitResult& OutHitResult, FVector& OutHitLocation);
 	void TraceForItems();
+	AWeapon* SpawnDefaultWeapon();
+	void EquipWeapon(AWeapon* WeaponToEquip);
+	void DropWeapon();
 
 	UFUNCTION()
 	void FinishCrosshairBulletFire();
@@ -59,6 +64,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* AimingAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* SelectAction;
+
 	bool bFireButtonPressed;
 
 	bool bShouldFire;
@@ -66,6 +74,8 @@ protected:
 	float AutomaticFireRate;
 
 	FTimerHandle AutoFireTimer;
+
+	void SwapWeapon(AWeapon* WeaponToSwap);
 
 private:
 	
@@ -146,6 +156,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items, meta = (AllowPrivateAccess = "true"))
 	AItem* TraceHitItemLastFrame;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	AWeapon* EquippedWeapon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AWeapon> DefaultWeaponClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	AItem* TraceHitItem;
 
 	float ShootTimeDuration;
 	bool bFiringBullet;
